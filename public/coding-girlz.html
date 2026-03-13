@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Girlz · Team Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #12121e;
+    --card: #1a1a2e;
+    --accent1: #e040fb;
+    --accent2: #00e5ff;
+    --accent3: #ffea00;
+    --accent4: #69ff47;
+    --text: #f0eaff;
+    --muted: #7a7a9a;
+    --ww: #e040fb;
+    --cat: #00e5ff;
+    --sg: #ffea00;
+    --bw: #69ff47;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 8% 15%, rgba(224,64,251,.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 82% 8%, rgba(0,229,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 75%, rgba(255,234,0,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 55%, rgba(105,255,71,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 40%, rgba(224,64,251,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 85%, rgba(0,229,255,.3) 0%, transparent 100%);
+    background-size: 500px 500px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    text-align: center;
+    padding: 3.5rem 1rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .badge {
+    display: inline-block;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+    border-radius: 100px;
+    padding: .3rem 1rem;
+    margin-bottom: 1.3rem;
+    animation: pulse-border 2.5s infinite;
+  }
+  @keyframes pulse-border {
+    0%,100% { box-shadow: 0 0 0 0 rgba(224,64,251,.4); }
+    50% { box-shadow: 0 0 0 10px rgba(224,64,251,0); }
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    margin-top: .9rem;
+    color: var(--muted);
+    font-size: .95rem;
+    max-width: 480px;
+    margin-inline: auto;
+    line-height: 1.6;
+  }
+
+  /* STACKED BAR */
+  .global-bar-wrap {
+    max-width: 700px;
+    margin: 2rem auto 0;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .global-bar-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .6rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .global-bar-count {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: .04em;
+  }
+  .global-bar-count span {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .global-bar-legend {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .7rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .leg-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .global-bar-track {
+    height: 10px;
+    background: rgba(255,255,255,.06);
+    border-radius: 100px;
+    overflow: hidden;
+    display: flex;
+    gap: 2px;
+  }
+  .global-bar-seg {
+    height: 100%;
+    border-radius: 100px;
+    transition: width .6s cubic-bezier(.34,1.2,.64,1);
+    flex-shrink: 0;
+  }
+  #seg-ww  { background: var(--ww); }
+  #seg-cat { background: var(--cat); }
+  #seg-sg  { background: var(--sg); }
+  #seg-bw  { background: var(--bw); }
+  .global-bar-labels {
+    display: flex;
+    margin-top: .45rem;
+    height: 1.2rem;
+  }
+  .bar-label {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: width .6s cubic-bezier(.34,1.2,.64,1), opacity .3s;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bar-label.visible { opacity: 1; }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    margin: 2rem 1rem 0;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .tab-btn {
+    background: var(--card);
+    border: 1px solid #2a2a40;
+    color: var(--muted);
+    padding: .55rem 1.4rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .25s;
+  }
+  .tab-btn:hover { border-color: var(--accent1); color: var(--text); }
+  .tab-btn.active { background: var(--accent1); border-color: var(--accent1); color: #000; font-weight: 700; }
+
+  main { max-width: 1120px; margin: 0 auto; padding: 2rem 1rem 5rem; position: relative; z-index: 1; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp .4s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+
+  /* TEAMS */
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.8rem;
+  }
+  .team-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 1.8rem 1.5rem 1.5rem;
+    border: 1px solid #2a2a40;
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 22px 22px 0 0;
+  }
+  .team-card[data-team="ww"]::before { background: var(--ww); }
+  .team-card[data-team="cat"]::before { background: var(--cat); }
+  .team-card[data-team="sg"]::before { background: var(--sg); }
+  .team-card[data-team="bw"]::before { background: var(--bw); }
+  .team-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+
+  .team-hero-icon { font-size: 3rem; margin-bottom: .5rem; display: block; }
+  .team-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: .15rem;
+  }
+  .team-card[data-team="ww"] .team-name { color: var(--ww); }
+  .team-card[data-team="cat"] .team-name { color: var(--cat); }
+  .team-card[data-team="sg"] .team-name { color: var(--sg); }
+  .team-card[data-team="bw"] .team-name { color: var(--bw); }
+  .teams-intro {
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto 0;
+    padding-bottom: .8rem;
+  }
+  .teams-intro-label {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: .5rem;
+  }
+  .teams-intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 900;
+    margin-bottom: .6rem;
+  }
+  .teams-intro-sub {
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.6;
+  }
+  .team-virtue {
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .6rem;
+  }
+  .team-chart-tag { display: none; }
+
+  .team-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    opacity: 0;
+    transition: opacity .35s;
+    pointer-events: none;
+  }
+  .team-card[data-team="ww"]::after { background: radial-gradient(ellipse at 50% 0%, rgba(224,64,251,.12) 0%, transparent 70%); }
+  .team-card[data-team="cat"]::after { background: radial-gradient(ellipse at 50% 0%, rgba(0,229,255,.12) 0%, transparent 70%); }
+  .team-card[data-team="sg"]::after  { background: radial-gradient(ellipse at 50% 0%, rgba(255,234,0,.10) 0%, transparent 70%); }
+  .team-card[data-team="bw"]::after  { background: radial-gradient(ellipse at 50% 0%, rgba(105,255,71,.10) 0%, transparent 70%); }
+  .team-card:hover::after { opacity: 1; }
+
+  .team-card[data-team="ww"] .team-virtue { color: rgba(224,64,251,.7); }
+  .team-card[data-team="cat"] .team-virtue { color: rgba(0,229,255,.7); }
+  .team-card[data-team="sg"] .team-virtue  { color: rgba(255,234,0,.7); }
+  .team-card[data-team="bw"] .team-virtue  { color: rgba(105,255,71,.7); }
+
+  .team-members { list-style: none; min-height: 60px; }
+  .team-members li {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .32rem 0;
+    font-size: .875rem;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    animation: fadeUp .3s ease;
+  }
+  .member-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .team-card[data-team="ww"] .member-dot { background: var(--ww); }
+  .team-card[data-team="cat"] .member-dot { background: var(--cat); }
+  .team-card[data-team="sg"] .member-dot { background: var(--sg); }
+  .team-card[data-team="bw"] .member-dot { background: var(--bw); }
+  .member-value {
+    margin-left: auto;
+    font-size: .68rem;
+    font-weight: 700;
+    padding: .15rem .5rem;
+    border-radius: 100px;
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .team-count { margin-top: .9rem; font-size: .75rem; color: var(--muted); }
+  .team-count span { font-weight: 700; color: var(--text); }
+  .team-progress { margin-top: .5rem; height: 3px; background: rgba(255,255,255,.07); border-radius: 10px; overflow: hidden; }
+  .team-progress-bar { height: 100%; border-radius: 10px; transition: width .4s ease; }
+  .team-card[data-team="ww"] .team-progress-bar { background: var(--ww); }
+  .team-card[data-team="cat"] .team-progress-bar { background: var(--cat); }
+  .team-card[data-team="sg"] .team-progress-bar { background: var(--sg); }
+  .team-card[data-team="bw"] .team-progress-bar { background: var(--bw); }
+
+  .global-bar-inner {
+    max-width: 100%;
+    padding: 0;
+    margin-top: 2rem;
+  }
+  .admin-bar { text-align: center; margin-top: 1.5rem; display: flex; justify-content: center; gap: .8rem; flex-wrap: wrap; }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid #3a3a50;
+    color: var(--muted);
+    padding: .45rem 1.4rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .75rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-reset:hover { border-color: #ff5555; color: #ff5555; }
+  .btn-download {
+    background: transparent;
+    border: 1px solid #3a3a50;
+    color: var(--muted);
+    padding: .45rem 1.4rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .75rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-download:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* PIN MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--card);
+    border: 1px solid #2a2a40;
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    max-width: 340px;
+    width: 90%;
+    text-align: center;
+    transform: scale(.94);
+    transition: transform .3s;
+  }
+  .modal-overlay.show .modal-box { transform: scale(1); }
+  .modal-box h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: .4rem; }
+  .modal-box p { color: var(--muted); font-size: .85rem; margin-bottom: 1.5rem; }
+  .pin-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid #3a3a50;
+    border-radius: 12px;
+    padding: .8rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: .4em;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .pin-input:focus { border-color: var(--accent1); }
+  .pin-error { color: #ff6b6b; font-size: .8rem; margin-top: .5rem; min-height: 1.2rem; }
+  .modal-btns { display: flex; gap: .7rem; margin-top: 1.2rem; }
+  .btn-cancel {
+    flex: 1; padding: .7rem;
+    background: transparent; border: 1px solid #3a3a50; color: var(--muted);
+    border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: .9rem; cursor: pointer; transition: all .2s;
+  }
+  .btn-cancel:hover { border-color: var(--text); color: var(--text); }
+  .btn-confirm {
+    flex: 1; padding: .7rem;
+    background: #ff5555; border: none; color: #fff;
+    border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .9rem; cursor: pointer; transition: opacity .2s;
+  }
+  .btn-confirm:hover { opacity: .85; }
+
+  /* JOIN */
+  .join-wrap {
+    max-width: 680px;
+    margin: 2rem auto 0;
+    background: var(--card);
+    border-radius: 26px;
+    border: 1px solid #2a2a40;
+    padding: 2.8rem 3rem;
+  }
+  .join-wrap h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; margin-bottom: .4rem; }
+  .join-wrap > p { color: var(--muted); font-size: .92rem; margin-bottom: 1.8rem; line-height: 1.6; }
+
+  label { display: block; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .45rem; margin-top: 1.3rem; }
+  input[type=text], select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid #2a2a40;
+    border-radius: 12px;
+    padding: .82rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  input[type=text] { cursor: text; }
+  input[type=text]:focus, select:focus { border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(224,64,251,.12); }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+  select option { background: #1a1a2e; }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .55rem;
+    margin-top: .6rem;
+  }
+  .value-chip {
+    background: var(--surface);
+    border: 1px solid #2a2a40;
+    border-radius: 14px;
+    padding: .65rem .4rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: .75rem;
+    font-weight: 500;
+    transition: all .2s;
+    line-height: 1.3;
+  }
+  .value-chip .emoji { display: block; font-size: 1.5rem; margin-bottom: .25rem; }
+  .value-chip:hover { border-color: var(--accent2); background: rgba(0,229,255,.07); }
+  .value-chip.selected { border-color: var(--accent1); background: rgba(224,64,251,.15); color: var(--accent1); font-weight: 700; box-shadow: 0 0 0 2px rgba(224,64,251,.2); }
+
+  .btn-join {
+    width: 100%; margin-top: 1.8rem; padding: 1rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    border: none; border-radius: 14px; color: #000;
+    font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem;
+    cursor: pointer; transition: opacity .2s, transform .15s; letter-spacing: .03em;
+  }
+  .btn-join:hover { opacity: .9; transform: scale(1.015); }
+  .btn-join:active { transform: scale(.98); }
+
+  /* SPIRIT */
+  .spirit-section { margin-top: 1.5rem; }
+  .spirit-section h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; margin-bottom: .35rem; }
+  .spirit-section > p { color: var(--muted); font-size: .9rem; margin-bottom: 2rem; line-height: 1.6; }
+
+  .mission-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .mission-card {
+    background: var(--card);
+    border: 1px solid #2a2a40;
+    border-radius: 18px;
+    padding: 1.6rem 1.4rem;
+    transition: transform .2s;
+  }
+  .mission-card:hover { transform: translateY(-3px); }
+  .mission-card .m-icon { font-size: 2.2rem; margin-bottom: .7rem; display: block; }
+  .mission-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .45rem; }
+  .mission-card p { font-size: .83rem; color: var(--muted); line-height: 1.6; }
+
+  .chart-section {
+    background: var(--card);
+    border: 1px solid #2a2a40;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .chart-section h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: .3rem; color: var(--accent3); }
+  .chart-section > p { color: var(--muted); font-size: .85rem; margin-bottom: 1.5rem; }
+  .chart-assignments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+  }
+  .chart-item { border-radius: 14px; padding: 1.2rem; border: 1px solid; }
+  .chart-item[data-t="ww"] { border-color: rgba(224,64,251,.3); background: rgba(224,64,251,.06); }
+  .chart-item[data-t="cat"] { border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.06); }
+  .chart-item[data-t="sg"] { border-color: rgba(255,234,0,.3); background: rgba(255,234,0,.06); }
+  .chart-item[data-t="bw"] { border-color: rgba(105,255,71,.3); background: rgba(105,255,71,.06); }
+  .chart-item-team { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .5rem; }
+  .chart-item[data-t="ww"] .chart-item-team { color: var(--ww); }
+  .chart-item[data-t="cat"] .chart-item-team { color: var(--cat); }
+  .chart-item[data-t="sg"] .chart-item-team { color: var(--sg); }
+  .chart-item[data-t="bw"] .chart-item-team { color: var(--bw); }
+  .chart-item-name { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+  .chart-item-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+
+  .hackathon-flow { background: var(--card); border: 1px solid #2a2a40; border-radius: 20px; padding: 2rem; }
+  .hackathon-flow h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 1.6rem; color: var(--accent2); }
+  .flow-step {
+    display: flex; gap: 1.1rem; align-items: flex-start;
+    margin-bottom: 1.3rem; padding-bottom: 1.3rem;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .flow-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .flow-num {
+    min-width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .82rem; color: #000; flex-shrink: 0;
+  }
+  .flow-step h4 { font-size: .92rem; font-weight: 700; margin-bottom: .3rem; }
+  .flow-step p { font-size: .83rem; color: var(--muted); line-height: 1.6; }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(50px);
+    background: var(--accent1); color: #000; font-weight: 700;
+    padding: .85rem 2rem; border-radius: 100px; font-size: .9rem;
+    opacity: 0; transition: all .35s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,.05);
+    margin-top: 2rem;
+  }
+  footer p {
+    font-size: .72rem;
+    color: #3a3a55;
+    letter-spacing: .1em;
+  }
+
+  @media (max-width: 900px) {
+    .teams-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .join-wrap { padding: 1.5rem 1rem; }
+    .values-grid { gap: .4rem; }
+    .value-chip { font-size: .7rem; padding: .55rem .25rem; }
+    .value-chip .emoji { font-size: 1.3rem; }
+    .tab-btn { padding: .5rem 1rem; font-size: .8rem; }
+    .team-hero-icon { font-size: 2.2rem; }
+    .team-name { font-size: 1.1rem; }
+  }
+  @media (max-width: 360px) {
+    .teams-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">⚡ Hackathon · Coding Girlz</div>
+  <h1>Scegli la tua squadra</h1>
+  <p>25 ragazze. 4 squadre. Infinite possibilità.<br>Ogni eroina porta un superpotere unico.</p>
+</header>
+
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('teams',this)">🦸‍♀️ Le Squadre</button>
+  <button class="tab-btn" onclick="showTab('join',this)">✨ Entra nel Team</button>
+  <button class="tab-btn" onclick="showTab('spirit',this)">💫 Spirito di Squadra</button>
+</nav>
+
+<main>
+
+  <!-- TAB 1 -->
+  <div id="tab-teams" class="tab-panel active">
+    <div class="teams-intro">
+      <p class="teams-intro-label">Come funziona</p>
+      <h2 class="teams-intro-title">Quattro eroine. Siete voi.</h2>
+      <p class="teams-intro-sub">Ogni squadra è fatta di persone come te, pezzi diversi che insieme formano qualcosa di più grande. Scegli quella in cui ti riconosci. Non quella che ti sembra più facile.</p>
+    </div>
+
+    <div class="teams-grid">
+      <div class="team-card" data-team="ww">
+        <span class="team-hero-icon">👑</span>
+        <div class="team-name">Wonder Women</div>
+        <div class="team-virtue">Coraggio</div>
+        <ul class="team-members" id="members-ww"></ul>
+        <div class="team-count">Posti: <span id="count-ww">0</span> / 7</div>
+        <div class="team-progress"><div class="team-progress-bar" id="bar-ww" style="width:0%"></div></div>
+      </div>
+      <div class="team-card" data-team="cat">
+        <span class="team-hero-icon">🐱</span>
+        <div class="team-name">Catwomen</div>
+        <div class="team-virtue">Curiosità</div>
+        <ul class="team-members" id="members-cat"></ul>
+        <div class="team-count">Posti: <span id="count-cat">0</span> / 6</div>
+        <div class="team-progress"><div class="team-progress-bar" id="bar-cat" style="width:0%"></div></div>
+      </div>
+      <div class="team-card" data-team="sg">
+        <span class="team-hero-icon">⚡</span>
+        <div class="team-name">Supergirls</div>
+        <div class="team-virtue">Resilienza</div>
+        <ul class="team-members" id="members-sg"></ul>
+        <div class="team-count">Posti: <span id="count-sg">0</span> / 6</div>
+        <div class="team-progress"><div class="team-progress-bar" id="bar-sg" style="width:0%"></div></div>
+      </div>
+      <div class="team-card" data-team="bw">
+        <span class="team-hero-icon">🕷️</span>
+        <div class="team-name">Black Widows</div>
+        <div class="team-virtue">Strategia</div>
+        <ul class="team-members" id="members-bw"></ul>
+        <div class="team-count">Posti: <span id="count-bw">0</span> / 6</div>
+        <div class="team-progress"><div class="team-progress-bar" id="bar-bw" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="global-bar-wrap global-bar-inner">
+      <div class="global-bar-meta">
+        <span class="global-bar-count"><span id="total-count">0</span> / 25</span>
+        <div class="global-bar-legend">
+          <span class="leg-dot" style="background:var(--ww)"></span><span>Wonder Women</span>
+          <span class="leg-dot" style="background:var(--cat)"></span><span>Catwomen</span>
+          <span class="leg-dot" style="background:var(--sg)"></span><span>Supergirls</span>
+          <span class="leg-dot" style="background:var(--bw)"></span><span>Black Widows</span>
+        </div>
+      </div>
+      <div class="global-bar-track">
+        <div class="global-bar-seg" id="seg-ww" style="width:0%" title="Wonder Women"></div>
+        <div class="global-bar-seg" id="seg-cat" style="width:0%" title="Catwomen"></div>
+        <div class="global-bar-seg" id="seg-sg" style="width:0%" title="Supergirls"></div>
+        <div class="global-bar-seg" id="seg-bw" style="width:0%" title="Black Widows"></div>
+      </div>
+      <div class="global-bar-labels">
+        <span id="lab-ww" class="bar-label"></span>
+        <span id="lab-cat" class="bar-label"></span>
+        <span id="lab-sg" class="bar-label"></span>
+        <span id="lab-bw" class="bar-label"></span>
+      </div>
+    </div>
+
+    <div class="admin-bar">
+      <button class="btn-download" onclick="downloadCSV()">⬇ Scarica CSV</button>
+      <button class="btn-reset" onclick="openResetModal()">🔐 Reset dati (admin)</button>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="tab-join" class="tab-panel">
+    <div class="join-wrap">
+      <h2>Entra nella storia ✨</h2>
+      <p>Scegli il tuo nome, la tua squadra e il tuo superpotere.<br>Sarai parte di qualcosa di grande.</p>
+
+      <label for="input-name">Il tuo nome</label>
+      <input type="text" id="input-name" placeholder="es. Alessia, Martina, Bea, Sofia…" maxlength="40" autocomplete="off">
+
+      <label>La tua squadra</label>
+      <select id="select-team">
+        <option value="">— Scegli la tua eroina —</option>
+        <option value="ww">👑 Wonder Women · Coraggio</option>
+        <option value="cat">🐱 Catwomen · Curiosità</option>
+        <option value="sg">⚡ Supergirls · Resilienza</option>
+        <option value="bw">🕷️ Black Widows · Strategia</option>
+      </select>
+
+      <label>Il tuo superpotere personale</label>
+      <div class="values-grid">
+        <div class="value-chip" onclick="selectValue(this,'Curiosità')"><span class="emoji">🔍</span>Curiosità</div>
+        <div class="value-chip" onclick="selectValue(this,'Allegria')"><span class="emoji">🌟</span>Allegria</div>
+        <div class="value-chip" onclick="selectValue(this,'Speranza')"><span class="emoji">🌈</span>Speranza</div>
+        <div class="value-chip" onclick="selectValue(this,'Precisione')"><span class="emoji">🎯</span>Precisione</div>
+        <div class="value-chip" onclick="selectValue(this,'Empatia')"><span class="emoji">💜</span>Empatia</div>
+        <div class="value-chip" onclick="selectValue(this,'Creatività')"><span class="emoji">🎨</span>Creatività</div>
+        <div class="value-chip" onclick="selectValue(this,'Determinazione')"><span class="emoji">🔥</span>Determinazione</div>
+        <div class="value-chip" onclick="selectValue(this,'Intuizione')"><span class="emoji">💡</span>Intuizione</div>
+        <div class="value-chip" onclick="selectValue(this,'Coraggio')"><span class="emoji">🦁</span>Coraggio</div>
+        <div class="value-chip" onclick="selectValue(this,'Ascolto')"><span class="emoji">👂</span>Ascolto</div>
+        <div class="value-chip" onclick="selectValue(this,'Ironia')"><span class="emoji">😄</span>Ironia</div>
+        <div class="value-chip" onclick="selectValue(this,'Organizzazione')"><span class="emoji">📋</span>Organizzazione</div>
+        <div class="value-chip" onclick="selectValue(this,'Velocità')"><span class="emoji">⚡</span>Velocità</div>
+        <div class="value-chip" onclick="selectValue(this,'Visione')"><span class="emoji">🔭</span>Visione</div>
+        <div class="value-chip" onclick="selectValue(this,'Cura')"><span class="emoji">🌸</span>Cura</div>
+        <div class="value-chip" onclick="selectValue(this,'Tenacia')"><span class="emoji">🏔️</span>Tenacia</div>
+      </div>
+
+      <button class="btn-join" onclick="joinTeam()">Unisciti alla squadra →</button>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="tab-spirit" class="tab-panel">
+    <div class="spirit-section">
+      <h2>Il progetto è il pretesto 💫</h2>
+      <p>Alla fine di oggi quello che vi portate a casa non sono i grafici. Siete voi, e le persone che avete scoperto di avere accanto.</p>
+
+      <div class="mission-cards">
+        <div class="mission-card">
+          <span class="m-icon">🤝</span>
+          <h3>Prima conoscetevi, poi codificate</h3>
+          <p>Nomi, superpoteri e una cosa assurda che sapete fare. Non saltate questo passaggio, è quello che conta di più.</p>
+        </div>
+        <div class="mission-card">
+          <span class="m-icon">🎭</span>
+          <h3>Ognuna ha il suo ruolo</h3>
+          <p>Data Explorer, Visual Storyteller, Code Architect, Presenter. Nessuna fa tutto. Tutte fanno qualcosa di fondamentale.</p>
+        </div>
+        <div class="mission-card">
+          <span class="m-icon">🚀</span>
+          <h3>Lavorate, poi fermatevi</h3>
+          <p>A fine sprint prendetevi due minuti: cosa ha funzionato? Cosa rifareste? Dirlo ad alta voce cambia tutto.</p>
+        </div>
+        <div class="mission-card">
+          <span class="m-icon">✨</span>
+          <h3>Nomina il superpotere</h3>
+          <p>Nella presentazione finale ognuna cita il superpotere di una compagna che ha visto in azione. Nessuna si sottrae.</p>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h3>La sfida di ogni squadra 🎲</h3>
+        <p>Stesso dataset per tutte. Visualizzazione diversa per ognuna. Quattro storie dallo stesso insieme di numeri.</p>
+        <div class="chart-assignments">
+          <div class="chart-item" data-t="ww">
+            <div class="chart-item-team">👑 Wonder Women</div>
+            <div class="chart-item-name">🔒 Si scopre al via</div>
+            <div class="chart-item-desc">La vostra sfida vi aspetta. Spoiler: vi piacerà.</div>
+          </div>
+          <div class="chart-item" data-t="cat">
+            <div class="chart-item-team">🐱 Catwomen</div>
+            <div class="chart-item-name">🔒 Si scopre al via</div>
+            <div class="chart-item-desc">La vostra sfida vi aspetta. Spoiler: vi piacerà.</div>
+          </div>
+          <div class="chart-item" data-t="sg">
+            <div class="chart-item-team">⚡ Supergirls</div>
+            <div class="chart-item-name">🔒 Si scopre al via</div>
+            <div class="chart-item-desc">La vostra sfida vi aspetta. Spoiler: vi piacerà.</div>
+          </div>
+          <div class="chart-item" data-t="bw">
+            <div class="chart-item-team">🕷️ Black Widows</div>
+            <div class="chart-item-name">🔒 Si scopre al via</div>
+            <div class="chart-item-desc">La vostra sfida vi aspetta. Spoiler: vi piacerà.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hackathon-flow">
+        <h3>Come va la giornata</h3>
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div>
+            <h4>🎯 Squadre e presentazioni</h4>
+            <p>Scegliete la squadra su questa app. Poi giro veloce: nome, superpotere e una cosa strana che sapete fare. Assegnatevi i ruoli prima di toccare il dataset.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div>
+            <h4>🔍 Esplorate senza paura</h4>
+            <p>Ricevete il dataset. Guardatelo. Cosa vi colpisce? Cosa non vi torna? Non esiste risposta sbagliata in questa fase, solo curiosità.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div>
+            <h4>📊 Costruite la vostra storia</h4>
+            <p>La Data Explorer guida l'analisi, la Visual Storyteller decide come raccontarla, la Code Architect la costruisce. La Presenter inizia a pensare alle parole.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div>
+            <h4>🎤 Convinceteci</h4>
+            <p>Presentate come se doveste convincere qualcuno che non sa niente di dati. Parlate tutte. E nel finale nominate il superpotere di una compagna.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div>
+            <h4>💫 Si celebra, non si vince</h4>
+            <p>Ogni squadra dice una cosa che si porta a casa. I superpoteri vengono letti tutti ad alta voce. Fine.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <h3>🔐 Area Admin</h3>
+    <p>Inserisci il codice admin per resettare tutti i dati.</p>
+    <input class="pin-input" type="password" id="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+    <div class="pin-error" id="pin-error"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Annulla</button>
+      <button class="btn-confirm" onclick="confirmReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const LIMITS = { ww:7, cat:6, sg:6, bw:6 };
+  const ADMIN_PIN = '3618';
+  let selectedValue = '';
+
+  function getData() {
+    try { return JSON.parse(localStorage.getItem('cg_members') || '{}'); }
+    catch { return {}; }
+  }
+  function saveData(d) { localStorage.setItem('cg_members', JSON.stringify(d)); }
+
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'teams') renderTeams();
+  }
+
+  function selectValue(el, val) {
+    document.querySelectorAll('.value-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedValue = val;
+  }
+
+  function joinTeam() {
+    const name = document.getElementById('input-name').value.trim();
+    const team = document.getElementById('select-team').value;
+    if (!name) { showToast('Inserisci il tuo nome 😊'); return; }
+    if (!team) { showToast('Scegli la tua squadra!'); return; }
+    if (!selectedValue) { showToast('Scegli il tuo superpotere!'); return; }
+
+    const data = getData();
+    if (!data[team]) data[team] = [];
+
+    const all = Object.values(data).flat();
+    if (all.find(m => m.name.toLowerCase() === name.toLowerCase())) {
+      showToast('Questo nome è già presente!'); return;
+    }
+    if (data[team].length >= LIMITS[team]) {
+      showToast('Squadra al completo! Scegline un\'altra ✨'); return;
+    }
+
+    data[team].push({ name, value: selectedValue });
+    saveData(data);
+
+    document.getElementById('input-name').value = '';
+    document.getElementById('select-team').value = '';
+    document.querySelectorAll('.value-chip').forEach(c => c.classList.remove('selected'));
+    selectedValue = '';
+
+    showToast('Benvenuta, ' + name + '! ⚡');
+    setTimeout(() => {
+      showTab('teams', document.querySelector('.tab-btn'));
+    }, 1300);
+  }
+
+  function renderTeams() {
+    const data = getData();
+    const TOTAL = 25;
+    let grand = 0;
+
+    ['ww','cat','sg','bw'].forEach(team => {
+      const ul = document.getElementById('members-' + team);
+      const members = data[team] || [];
+      document.getElementById('count-' + team).textContent = members.length;
+      document.getElementById('bar-' + team).style.width = (members.length / LIMITS[team] * 100) + '%';
+      grand += members.length;
+      if (members.length === 0) {
+        ul.innerHTML = '<li style="color:var(--muted);font-size:.8rem;font-style:italic;border:none;padding:.5rem 0;">Nessun membro ancora</li>';
+        return;
+      }
+      ul.innerHTML = members.map(m =>
+        '<li><span class="member-dot"></span><span>' + escHtml(m.name) + '</span><span class="member-value">' + escHtml(m.value) + '</span></li>'
+      ).join('');
+    });
+
+    // Stacked bar
+    document.getElementById('total-count').textContent = grand;
+    ['ww','cat','sg','bw'].forEach(team => {
+      const n = (data[team] || []).length;
+      const pct = (n / TOTAL * 100).toFixed(1);
+      document.getElementById('seg-' + team).style.width = pct + '%';
+      const lab = document.getElementById('lab-' + team);
+      lab.style.width = pct + '%';
+      if (n > 0) {
+        lab.textContent = n;
+        lab.classList.add('visible');
+      } else {
+        lab.textContent = '';
+        lab.classList.remove('visible');
+      }
+    });
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function downloadCSV() {
+    const data = getData();
+    const teamNames = { ww: 'Wonder Women', cat: 'Catwomen', sg: 'Supergirls', bw: 'Black Widows' };
+    const teamVirtues = { ww: 'Coraggio', cat: 'Curiosità', sg: 'Resilienza', bw: 'Strategia' };
+    let rows = [['Nome', 'Squadra', 'Virtù squadra', 'Superpotere']];
+    ['ww','cat','sg','bw'].forEach(team => {
+      (data[team] || []).forEach(m => {
+        rows.push([m.name, teamNames[team], teamVirtues[team], m.value]);
+      });
+    });
+    const total = rows.length - 1;
+    if (total === 0) { showToast('Nessuna ragazza iscritta ancora!'); return; }
+    const csv = rows.map(r => r.map(c => '"' + c.replace(/"/g, '""') + '"').join(',')).join('\r\n');
+    const bom = '\uFEFF'; // UTF-8 BOM for Excel
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'coding_girlz_squadre.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV scaricato (' + total + ' partecipanti)');
+  }
+
+  function openResetModal() {
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-error').textContent = '';
+    document.getElementById('modal-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('pin-input').focus(), 200);
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+  function confirmReset() {
+    const pin = document.getElementById('pin-input').value;
+    if (pin !== ADMIN_PIN) {
+      document.getElementById('pin-error').textContent = 'Codice errato. Riprova.';
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-input').focus();
+      return;
+    }
+    localStorage.removeItem('cg_members');
+    closeModal();
+    renderTeams();
+    showToast('✅ Dati resettati.');
+  }
+
+  document.addEventListener('keydown', e => {
+    const modal = document.getElementById('modal-overlay');
+    if (!modal.classList.contains('show')) return;
+    if (e.key === 'Enter') confirmReset();
+    if (e.key === 'Escape') closeModal();
+  });
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  renderTeams();
+</script>
+<footer>
+  <p>Luigi Rossetti 2026 · All rights reserved</p>
+</footer>
+
+</body>
+</html>
