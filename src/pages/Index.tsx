@@ -41,6 +41,23 @@ const GridLines = () => (
   }} />
 );
 
+const Footer = () => (
+  <div style={{
+    position: "absolute",
+    bottom: "1.2rem",
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    color: "#484644",
+    fontSize: "0.75rem",
+    fontWeight: 300,
+    letterSpacing: "0.05em",
+    zIndex: 1,
+  }}>
+    © Luigi Rossetti 2026 — All rights reserved
+  </div>
+);
+
 const Index = () => {
   const [active, setActive] = useState<string | null>(null);
 
@@ -57,15 +74,12 @@ const Index = () => {
         position: "relative",
         overflow: "hidden",
       }}>
-        {/* Animated background */}
         <GridLines />
         <FloatingOrb color="#e040fb" size={400} x="10%" y="20%" duration={8} />
         <FloatingOrb color="#00e5ff" size={350} x="70%" y="10%" duration={10} />
         <FloatingOrb color="#ffea00" size={300} x="50%" y="65%" duration={12} />
         <FloatingOrb color="#69ff47" size={250} x="20%" y="70%" duration={9} />
-        <FloatingOrb color="#5b9cf6" size={200} x="80%" y="60%" duration={11} />
 
-        {/* Scan line effect */}
         <motion.div
           style={{
             position: "absolute",
@@ -79,7 +93,6 @@ const Index = () => {
           transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Content */}
         <motion.div
           style={{ position: "relative", zIndex: 1, textAlign: "center", padding: "2rem" }}
           initial={{ opacity: 0, y: 30 }}
@@ -113,20 +126,20 @@ const Index = () => {
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             lineHeight: 1.05,
-            marginBottom: "0.8rem",
+            marginBottom: "0.5rem",
           }}>
             Coding Girlz
           </h1>
 
           <p style={{
-            color: "#7a7a9a",
-            fontSize: "1.05rem",
-            maxWidth: "420px",
-            margin: "0 auto 2.5rem",
-            lineHeight: 1.6,
+            color: "#9a98a0",
+            fontSize: "1.15rem",
+            fontStyle: "italic",
             fontWeight: 300,
+            marginBottom: "2.5rem",
+            letterSpacing: "0.02em",
           }}>
-            Dashboard interattive per esplorare squadre, competenze e risultati dell'hackathon
+            I dati siamo noi
           </p>
 
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
@@ -158,21 +171,7 @@ const Index = () => {
           </div>
         </motion.div>
 
-        {/* Footer */}
-        <div style={{
-          position: "absolute",
-          bottom: "1.5rem",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          color: "#484644",
-          fontSize: "0.75rem",
-          fontWeight: 300,
-          letterSpacing: "0.05em",
-          zIndex: 1,
-        }}>
-          © Luigi Rossetti 2026 — Tutti i diritti riservati
-        </div>
+        <Footer />
       </div>
     );
   }
@@ -184,43 +183,52 @@ const Index = () => {
       <nav style={{
         display: "flex",
         alignItems: "center",
-        gap: "0.5rem",
-        padding: "0.5rem 1rem",
-        background: "#12121e",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        gap: "0.4rem",
+        padding: "0.6rem 1rem",
+        background: "linear-gradient(180deg, #12121e 0%, #0e0e18 100%)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
         flexShrink: 0,
+        backdropFilter: "blur(12px)",
       }}>
         <button
           onClick={() => setActive(null)}
           style={{
             background: "none",
-            border: "1px solid rgba(255,255,255,0.2)",
-            color: "#f0eaff",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "#c0bfca",
             borderRadius: "8px",
-            padding: "0.4rem 0.8rem",
+            padding: "0.45rem 0.9rem",
             cursor: "pointer",
-            fontSize: "0.85rem",
+            fontSize: "0.82rem",
             fontWeight: 500,
             fontFamily: "'DM Sans', sans-serif",
+            transition: "all 0.2s",
+            marginRight: "0.3rem",
           }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.color = "#c0bfca"; }}
         >
           ← Home
         </button>
+        <div style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.1)", margin: "0 0.3rem" }} />
         {pages.map((p) => (
           <button
             key={p.id}
             onClick={() => setActive(p.id)}
             style={{
-              background: active === p.id ? "rgba(255,255,255,0.1)" : "none",
-              border: active === p.id ? "1px solid rgba(255,255,255,0.25)" : "1px solid transparent",
-              color: active === p.id ? "#fff" : "#7a7a9a",
+              background: active === p.id ? "rgba(255,255,255,0.08)" : "none",
+              border: active === p.id ? "1px solid rgba(255,255,255,0.2)" : "1px solid transparent",
+              color: active === p.id ? "#fff" : "#6a6878",
               borderRadius: "8px",
-              padding: "0.4rem 1rem",
+              padding: "0.45rem 1rem",
               cursor: "pointer",
-              fontSize: "0.85rem",
-              fontWeight: 500,
+              fontSize: "0.82rem",
+              fontWeight: active === p.id ? 600 : 400,
               fontFamily: "'DM Sans', sans-serif",
+              transition: "all 0.2s",
             }}
+            onMouseEnter={e => { if (active !== p.id) e.currentTarget.style.color = "#aaa"; }}
+            onMouseLeave={e => { if (active !== p.id) e.currentTarget.style.color = "#6a6878"; }}
           >
             {p.label}
           </button>
