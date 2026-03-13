@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Girlz — Competenze Pre/Post</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #f0eee8;
+  --text-muted: #888785;
+  --text-dim: #484644;
+  --pre: #5b9cf6;
+  --post: #3ecf8e;
+  --neg: #f4845f;
+  --accent: #c9a96e;
+  --accent-dim: rgba(201,169,110,0.12);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  padding: 0 0 5rem;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 2rem 2.5rem;
+  border-bottom: 0.5px solid var(--border2);
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.arc-wrap {
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 280px; height: 280px;
+  pointer-events: none;
+  opacity: 0.15;
+  animation: spin 28s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.arc-wrap circle { fill: none; stroke: var(--accent); stroke-dasharray: 6 14; }
+
+.header-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.header-left { max-width: 500px; }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 20px; height: 1px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text);
+}
+h1 em { font-style: italic; color: var(--accent); }
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.squads { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; padding-bottom: 4px; }
+
+.squad-pill {
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border2);
+  color: var(--text-muted);
+  background: var(--surface);
+  cursor: default;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  user-select: none;
+  white-space: nowrap;
+}
+.squad-pill:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+.squad-pill:active { transform: scale(0.96); }
+
+/* ── MAIN ── */
+.main {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 2rem 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--surface2); color: var(--text); border-color: rgba(255,255,255,0.22); }
+.btn:active { transform: scale(0.97); }
+
+.btn-accent { background: var(--accent); color: #0d0d0f; border-color: var(--accent); }
+.btn-accent:hover { background: #d4b47a; border-color: #d4b47a; color: #0d0d0f; }
+
+.btn-ghost-red { color: #f4845f; border-color: rgba(244,132,95,0.3); }
+.btn-ghost-red:hover { background: rgba(244,132,95,0.08); border-color: #f4845f; color: #f4845f; }
+
+.btn-ghost-teal { color: var(--post); border-color: rgba(62,207,142,0.3); }
+.btn-ghost-teal:hover { background: rgba(62,207,142,0.08); border-color: var(--post); color: var(--post); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+
+thead th {
+  text-align: center;
+  padding: 6px 6px;
+  color: var(--text-dim);
+  font-weight: 400;
+  border-bottom: 0.5px solid var(--border);
+  white-space: nowrap;
+}
+thead th:first-child { text-align: left; padding-left: 0; }
+thead th.pre-h  { color: var(--pre); }
+thead th.post-h { color: var(--post); }
+
+tbody tr { border-bottom: 0.5px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 7px 4px; text-align: center; }
+tbody td:first-child {
+  text-align: left; padding-left: 0; padding-right: 14px;
+  font-weight: 500; font-size: 13px; color: var(--text); white-space: nowrap;
+}
+
+input[type=number] {
+  width: 54px; padding: 5px 6px;
+  font-size: 12px; font-family: 'DM Sans', sans-serif;
+  border: 0.5px solid var(--border2);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+  -moz-appearance: textfield;
+}
+input[type=number]:focus { outline: none; border-color: var(--accent); background: #25251e; }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; gap: 18px; flex-wrap: wrap;
+  align-items: center; font-size: 12px; color: var(--text-muted);
+}
+.leg-item { display: flex; align-items: center; gap: 7px; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── CHART ── */
+.chart-section { display: flex; width: 100%; align-items: flex-start; }
+.y-labels { display: flex; flex-direction: column; flex-shrink: 0; width: 150px; }
+.y-label {
+  display: flex; align-items: center; justify-content: flex-end;
+  text-align: right; padding-right: 14px;
+  font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.3;
+}
+.chart-wrap { flex: 1; position: relative; min-width: 0; }
+
+/* ── NOTE ── */
+.note {
+  font-size: 11px; color: var(--text-dim); line-height: 1.7;
+  border-top: 0.5px solid var(--border); padding-top: 1rem;
+}
+.note strong { color: #555350; font-weight: 500; }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 940px; margin: 3rem auto 0;
+  padding: 1.5rem 2rem;
+  border-top: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.footer-copy { font-size: 11px; color: var(--text-dim); font-weight: 300; letter-spacing: 0.03em; }
+.footer-copy strong { color: var(--text-muted); font-weight: 500; }
+.footer-badge {
+  font-size: 10px; padding: 3px 10px;
+  border-radius: 20px; border: 0.5px solid var(--border2);
+  color: var(--text-dim); letter-spacing: 0.05em;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="arc-wrap" viewBox="0 0 280 280">
+    <circle cx="140" cy="140" r="110" stroke-width="1"/>
+    <circle cx="140" cy="140" r="85"  stroke-width="0.7" stroke-dasharray="3 18"/>
+    <circle cx="140" cy="140" r="60"  stroke-width="0.5" stroke-dasharray="1 22"/>
+  </svg>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="eyebrow">Coding Girlz · DataLab</div>
+      <h1>Competenze<br><em>pre &amp; post</em> hackathon</h1>
+      <p class="subtitle">Punteggi normalizzati per squadra · scala 1–10 → 0–100%<br>Inserisci le medie prima dell'evento e dopo — il grafico si aggiorna.</p>
+    </div>
+    <div class="squads">
+      <span class="squad-pill">👑 Wonder Women</span>
+      <span class="squad-pill">🐱 Catwomen</span>
+      <span class="squad-pill">⚡ Supergirls</span>
+      <span class="squad-pill">🕷️ Black Widows</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Media di squadra per competenza · scala 1–10</span>
+      <div class="btn-group">
+        <button class="btn btn-ghost-red"  onclick="resetAll()">Azzera</button>
+        <button class="btn btn-ghost-teal" onclick="downloadCSV()">Esporta CSV ↓</button>
+        <button class="btn btn-accent"     onclick="renderChart()">Aggiorna →</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="pre-h" colspan="2">Lettura del dato</th>
+            <th class="pre-h" colspan="2">Visualizzazione</th>
+            <th class="pre-h" colspan="2">Interpretazione critica</th>
+            <th class="pre-h" colspan="2">Comunicazione</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th class="pre-h">Pre</th><th class="post-h">Post</th>
+            <th class="pre-h">Pre</th><th class="post-h">Post</th>
+            <th class="pre-h">Pre</th><th class="post-h">Post</th>
+            <th class="pre-h">Pre</th><th class="post-h">Post</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><span class="leg-dot" style="background:var(--pre)"></span>Pre hackathon</div>
+    <div class="leg-item"><span class="leg-dot" style="background:var(--post)"></span>Post hackathon</div>
+    <span style="font-size:11px;color:var(--text-dim);">freccia verde = crescita · freccia arancio = calo · Δ% = variazione normalizzata</span>
+  </div>
+
+  <div class="chart-section">
+    <div class="y-labels" id="yLabels"></div>
+    <div class="chart-wrap" id="chartWrap">
+      <canvas id="dotChart"></canvas>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Come leggere i valori</strong> · Ogni punteggio sulla scala 1–10 viene convertito in una percentuale compresa tra 0% (minimo assoluto della scala) e 100% (massimo assoluto). Questo permette di confrontare il cambiamento tra squadre e competenze su una base comune. Il Δ% indica quanti punti percentuali ha guadagnato — o perso — ciascuna squadra tra la rilevazione iniziale e quella finale.
+  </div>
+
+</div>
+
+<footer>
+  <span class="footer-copy">© 2026 <strong>Luigi Rossetti</strong> · Tutti i diritti riservati</span>
+  <span class="footer-badge">DataLab · Coding Girlz</span>
+</footer>
+
+<script>
+const COMPETENZE = ["Lettura del dato","Visualizzazione","Interpretazione critica","Comunicazione al gruppo"];
+const SQUADRE    = ["👑 Wonder Women","🐱 Catwomen","⚡ Supergirls","🕷️ Black Widows"];
+
+const defaultData = [
+  [5.4,7.2, 6.2,7.8, 4.8,6.5, 6.0,7.0],
+  [6.1,7.5, 5.0,6.4, 5.5,7.1, 4.5,6.2],
+  [6.5,8.0, 7.0,7.9, 6.2,7.8, 5.8,7.4],
+  [5.0,6.8, 4.8,6.0, 4.2,5.9, 5.2,6.6]
+];
+
+const PRE_COLOR  = "#5b9cf6";
+const POST_COLOR = "#3ecf8e";
+const NEG_COLOR  = "#f4845f";
+const nSq        = SQUADRE.length;
+const nComp      = COMPETENZE.length;
+const STEP       = 0.9;
+const GROUP      = nSq * STEP + 1.8;
+let chartInst    = null;
+
+function toPercent(v) {
+  return Math.round((Math.min(10, Math.max(1, v)) - 1) / 9 * 100);
+}
+
+function buildTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  SQUADRE.forEach((sq, si) => {
+    const tr = document.createElement('tr');
+    let html = `<td>${sq}</td>`;
+    for (let ci = 0; ci < 4; ci++) {
+      html += `<td><input type="number" id="s${si}_c${ci}_pre"  value="${defaultData[si][ci*2]}"   min="1" max="10" step="0.1"></td>`;
+      html += `<td><input type="number" id="s${si}_c${ci}_post" value="${defaultData[si][ci*2+1]}" min="1" max="10" step="0.1"></td>`;
+    }
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+}
+
+function resetAll() {
+  SQUADRE.forEach((_, si) => {
+    for (let ci = 0; ci < 4; ci++) {
+      document.getElementById(`s${si}_c${ci}_pre`).value  = 1;
+      document.getElementById(`s${si}_c${ci}_post`).value = 1;
+    }
+  });
+  renderChart();
+}
+
+function downloadCSV() {
+  const rows = [['squadra','competenza','pre_1_10','post_1_10','pre_pct','post_pct','delta_pct']];
+  SQUADRE.forEach((sq, si) => {
+    COMPETENZE.forEach((comp, ci) => {
+      const pre  = parseFloat(document.getElementById(`s${si}_c${ci}_pre`).value)  || 1;
+      const post = parseFloat(document.getElementById(`s${si}_c${ci}_post`).value) || 1;
+      const prePct  = toPercent(pre);
+      const postPct = toPercent(post);
+      rows.push([sq, comp, pre, post, prePct, postPct, postPct - prePct]);
+    });
+  });
+  const csv  = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'coding-girlz-competenze.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function getData() {
+  return SQUADRE.map((_, si) =>
+    COMPETENZE.map((_, ci) => ({
+      pre:  parseFloat(document.getElementById(`s${si}_c${ci}_pre`).value)  || defaultData[si][ci*2],
+      post: parseFloat(document.getElementById(`s${si}_c${ci}_post`).value) || defaultData[si][ci*2+1]
+    }))
+  );
+}
+
+function buildYLabels(totalH) {
+  const container = document.getElementById('yLabels');
+  container.style.height = totalH + 'px';
+  container.innerHTML = '';
+  COMPETENZE.forEach(comp => {
+    const div = document.createElement('div');
+    div.className = 'y-label';
+    div.style.height = (GROUP * 40) + 'px';
+    div.textContent = comp;
+    container.appendChild(div);
+  });
+}
+
+function renderChart() {
+  const data   = getData();
+  const totalH = nComp * GROUP * 40 + 60;
+  document.getElementById('chartWrap').style.height = totalH + 'px';
+  buildYLabels(totalH);
+
+  const preDatasets = SQUADRE.map((sq, si) => ({
+    label: sq + ' — pre',
+    data: COMPETENZE.map((_, ci) => ({
+      x: toPercent(data[si][ci].pre),
+      y: ci * GROUP + si * STEP
+    })),
+    backgroundColor: PRE_COLOR, borderColor: PRE_COLOR,
+    pointRadius: 6, pointHoverRadius: 8,
+    showLine: false, type: 'scatter'
+  }));
+
+  const postDatasets = SQUADRE.map((sq, si) => ({
+    label: sq + ' — post',
+    data: COMPETENZE.map((_, ci) => ({
+      x: toPercent(data[si][ci].post),
+      y: ci * GROUP + si * STEP,
+      delta: toPercent(data[si][ci].post) - toPercent(data[si][ci].pre)
+    })),
+    backgroundColor: POST_COLOR, borderColor: POST_COLOR,
+    pointRadius: 6, pointHoverRadius: 8,
+    showLine: false, type: 'scatter'
+  }));
+
+  const maxY = (nComp - 1) * GROUP + (nSq - 1) * STEP + 1;
+  if (chartInst) chartInst.destroy();
+
+  chartInst = new Chart(document.getElementById('dotChart'), {
+    type: 'scatter',
+    data: { datasets: [...preDatasets, ...postDatasets] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 350 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e1e24',
+          borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+          titleColor: '#f0eee8', bodyColor: '#888785',
+          callbacks: {
+            label: ctx => {
+              const d = ctx.raw;
+              const suffix = d.delta !== undefined ? `  Δ ${d.delta > 0 ? '+' : ''}${d.delta}%` : '';
+              return `${ctx.dataset.label}: ${d.x}%${suffix}`;
+            }
+          }
+        }
+      },
+      layout: { padding: { right: 52 } },
+      scales: {
+        x: {
+          min: 0, max: 100,
+          ticks: {
+            callback: v => v + '%', color: '#484644',
+            font: { size: 11, family: 'DM Sans' },
+            stepSize: 20, autoSkip: false
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'rgba(255,255,255,0.07)' },
+          title: { display: true, text: 'punteggio normalizzato (1–10 → 0–100%)', color: '#484644', font: { size: 11, family: 'DM Sans' } }
+        },
+        y: { min: -0.5, max: maxY, ticks: { display: false }, grid: { display: false }, border: { display: false } }
+      }
+    },
+    plugins: [{
+      id: 'connectors',
+      afterDatasetsDraw(chart) {
+        const ctx2 = chart.ctx;
+        const xS = chart.scales.x;
+        const yS = chart.scales.y;
+
+        SQUADRE.forEach((sq, si) => {
+          COMPETENZE.forEach((_, ci) => {
+            const y       = ci * GROUP + si * STEP;
+            const preVal  = toPercent(data[si][ci].pre);
+            const postVal = toPercent(data[si][ci].post);
+            const delta   = postVal - preVal;
+            const x1 = xS.getPixelForValue(preVal);
+            const x2 = xS.getPixelForValue(postVal);
+            const yPx = yS.getPixelForValue(y);
+            const col = delta >= 0 ? POST_COLOR : NEG_COLOR;
+            const dir = delta >= 0 ? 1 : -1;
+
+            ctx2.save();
+            ctx2.strokeStyle = col; ctx2.lineWidth = 1.5; ctx2.globalAlpha = 0.3;
+            ctx2.beginPath(); ctx2.moveTo(x1, yPx); ctx2.lineTo(x2, yPx); ctx2.stroke();
+
+            ctx2.globalAlpha = 0.88; ctx2.fillStyle = col;
+            const as = 5;
+            ctx2.beginPath();
+            ctx2.moveTo(x2, yPx);
+            ctx2.lineTo(x2 - dir * as, yPx - as);
+            ctx2.lineTo(x2 - dir * as, yPx + as);
+            ctx2.closePath(); ctx2.fill();
+
+            ctx2.globalAlpha = 1;
+            ctx2.fillStyle = delta >= 0 ? POST_COLOR : NEG_COLOR;
+            ctx2.font = '500 11px DM Sans, sans-serif';
+            ctx2.textAlign = delta >= 0 ? 'left' : 'right';
+            ctx2.fillText(
+              (delta > 0 ? '+' : '') + delta + '%',
+              delta >= 0 ? x2 + 9 : x2 - 9, yPx + 4
+            );
+            ctx2.restore();
+          });
+        });
+
+        COMPETENZE.forEach((_, ci) => {
+          if (ci === 0) return;
+          const sepY = yS.getPixelForValue(ci * GROUP - 0.9);
+          ctx2.save();
+          ctx2.strokeStyle = 'rgba(255,255,255,0.06)'; ctx2.lineWidth = 1;
+          ctx2.setLineDash([4, 5]);
+          ctx2.beginPath(); ctx2.moveTo(chart.chartArea.left, sepY); ctx2.lineTo(chart.chartArea.right, sepY); ctx2.stroke();
+          ctx2.restore();
+        });
+
+        COMPETENZE.forEach((_, ci) => {
+          SQUADRE.forEach((sq, si) => {
+            const y   = ci * GROUP + si * STEP;
+            const yPx = yS.getPixelForValue(y);
+            ctx2.save();
+            ctx2.fillStyle = 'rgba(136,135,133,0.45)';
+            ctx2.font = '10px DM Sans, sans-serif';
+            ctx2.textAlign = 'left';
+            ctx2.fillText(sq, chart.chartArea.left + 3, yPx - 6);
+            ctx2.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+buildTable();
+renderChart();
+</script>
+</body>
+</html>
