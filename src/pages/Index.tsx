@@ -1,9 +1,45 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const pages = [
-  { id: "teams", label: "🏆 Spirito di Squadra", src: "/coding-girlz.html" },
-  { id: "competenze", label: "📊 Risultati", src: "/coding-girlz-competenze.html" },
+  { id: "teams", label: "🏆 Spirito di Squadra", src: "/coding-girlz.html", gradient: "linear-gradient(135deg, #e040fb, #00e5ff)" },
+  { id: "competenze", label: "📊 Risultati", src: "/coding-girlz-competenze.html", gradient: "linear-gradient(135deg, #c9a96e, #5b9cf6)" },
 ];
+
+const FloatingOrb = ({ color, size, x, y, duration }: { color: string; size: number; x: string; y: string; duration: number }) => (
+  <motion.div
+    style={{
+      position: "absolute",
+      width: size,
+      height: size,
+      borderRadius: "50%",
+      background: `radial-gradient(circle, ${color}33 0%, transparent 70%)`,
+      left: x,
+      top: y,
+      filter: "blur(40px)",
+      pointerEvents: "none",
+    }}
+    animate={{
+      y: [0, -30, 0, 30, 0],
+      x: [0, 20, 0, -20, 0],
+      scale: [1, 1.15, 1, 0.9, 1],
+    }}
+    transition={{ duration, repeat: Infinity, ease: "easeInOut" }}
+  />
+);
+
+const GridLines = () => (
+  <div style={{
+    position: "absolute",
+    inset: 0,
+    backgroundImage: `
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+    `,
+    backgroundSize: "60px 60px",
+    pointerEvents: "none",
+  }} />
+);
 
 const Index = () => {
   const [active, setActive] = useState<string | null>(null);
@@ -16,43 +52,126 @@ const Index = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        background: "#0a0a12",
+        background: "#06060b",
         fontFamily: "'DM Sans', sans-serif",
-        gap: "1.5rem",
+        position: "relative",
+        overflow: "hidden",
       }}>
-        <h1 style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: "clamp(2rem, 5vw, 3.5rem)",
-          fontWeight: 900,
-          background: "linear-gradient(135deg, #e040fb, #00e5ff, #ffea00)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
+        {/* Animated background */}
+        <GridLines />
+        <FloatingOrb color="#e040fb" size={400} x="10%" y="20%" duration={8} />
+        <FloatingOrb color="#00e5ff" size={350} x="70%" y="10%" duration={10} />
+        <FloatingOrb color="#ffea00" size={300} x="50%" y="65%" duration={12} />
+        <FloatingOrb color="#69ff47" size={250} x="20%" y="70%" duration={9} />
+        <FloatingOrb color="#5b9cf6" size={200} x="80%" y="60%" duration={11} />
+
+        {/* Scan line effect */}
+        <motion.div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, rgba(224,64,251,0.3), transparent)",
+            pointerEvents: "none",
+          }}
+          animate={{ top: ["-5%", "105%"] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Content */}
+        <motion.div
+          style={{ position: "relative", zIndex: 1, textAlign: "center", padding: "2rem" }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.div
+            style={{
+              display: "inline-block",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "#e040fb",
+              border: "1px solid rgba(224,64,251,0.4)",
+              borderRadius: "100px",
+              padding: "0.35rem 1.2rem",
+              marginBottom: "1.5rem",
+            }}
+            animate={{ boxShadow: ["0 0 0 0 rgba(224,64,251,0.4)", "0 0 0 10px rgba(224,64,251,0)", "0 0 0 0 rgba(224,64,251,0.4)"] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+          >
+            Hackathon 2026
+          </motion.div>
+
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+            fontWeight: 900,
+            background: "linear-gradient(135deg, #e040fb 0%, #00e5ff 40%, #ffea00 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            lineHeight: 1.05,
+            marginBottom: "0.8rem",
+          }}>
+            Coding Girlz
+          </h1>
+
+          <p style={{
+            color: "#7a7a9a",
+            fontSize: "1.05rem",
+            maxWidth: "420px",
+            margin: "0 auto 2.5rem",
+            lineHeight: 1.6,
+            fontWeight: 300,
+          }}>
+            Dashboard interattive per esplorare squadre, competenze e risultati dell'hackathon
+          </p>
+
+          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
+            {pages.map((p, i) => (
+              <motion.button
+                key={p.id}
+                onClick={() => setActive(p.id)}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + i * 0.15 }}
+                style={{
+                  padding: "1rem 2.2rem",
+                  borderRadius: "14px",
+                  background: p.gradient,
+                  color: "#fff",
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                {p.label}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Footer */}
+        <div style={{
+          position: "absolute",
+          bottom: "1.5rem",
+          left: 0,
+          right: 0,
           textAlign: "center",
+          color: "#484644",
+          fontSize: "0.75rem",
+          fontWeight: 300,
+          letterSpacing: "0.05em",
+          zIndex: 1,
         }}>
-          Coding Girlz
-        </h1>
-        <p style={{ color: "#7a7a9a", fontSize: "1.1rem" }}>Scegli la dashboard da visualizzare</p>
-        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
-          {pages.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setActive(p.id)}
-              style={{
-                padding: "1rem 2rem",
-                borderRadius: "12px",
-                background: p.id === "teams"
-                  ? "linear-gradient(135deg, #e040fb, #00e5ff)"
-                  : "linear-gradient(135deg, #c9a96e, #5b9cf6)",
-                color: "#fff",
-                fontWeight: 700,
-                border: "none",
-                cursor: "pointer",
-                fontSize: "1rem",
-              }}
-            >
-              {p.label}
-            </button>
-          ))}
+          © Luigi Rossetti 2026 — Tutti i diritti riservati
         </div>
       </div>
     );
@@ -82,6 +201,7 @@ const Index = () => {
             cursor: "pointer",
             fontSize: "0.85rem",
             fontWeight: 500,
+            fontFamily: "'DM Sans', sans-serif",
           }}
         >
           ← Home
@@ -99,6 +219,7 @@ const Index = () => {
               cursor: "pointer",
               fontSize: "0.85rem",
               fontWeight: 500,
+              fontFamily: "'DM Sans', sans-serif",
             }}
           >
             {p.label}
