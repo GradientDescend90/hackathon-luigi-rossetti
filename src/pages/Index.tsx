@@ -171,6 +171,29 @@ const Index = () => {
               </motion.button>
             ))}
           </div>
+
+          <motion.button
+            onClick={() => navigate("/participants")}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            style={{
+              marginTop: "1.5rem",
+              padding: "0.8rem 2rem",
+              borderRadius: "14px",
+              background: "none",
+              color: "#9a98a0",
+              fontWeight: 600,
+              border: "1px solid rgba(255,255,255,0.15)",
+              cursor: "pointer",
+              fontSize: "0.9rem",
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            👥 Partecipanti
+          </motion.button>
         </motion.div>
 
         <Footer />
