@@ -61,6 +61,7 @@ const Footer = () => (
 
 const Index = () => {
   const [active, setActive] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   if (!active) {
     return (
