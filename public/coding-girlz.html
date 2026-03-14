@@ -849,23 +849,40 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-  const LIMITS = { ww:7, cat:6, sg:6, bw:6 };
-  const ADMIN_PIN = '3618';
-  let selectedValue = '';
+  const SUPABASE_URL = 'https://rmoxdbodyldxjbbexukd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtb3hkYm9keWxkeGpiYmV4dWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDQwODEsImV4cCI6MjA4OTAyMDA4MX0.lywCjrp84mTa2MEAHDiBfSJkKxU6dvEUOuhvT_MEst8';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  function getData() {
-    try { return JSON.parse(localStorage.getItem('cg_members') || '{}'); }
-    catch { return {}; }
+  const LIMITS = { ww:7, cat:6, sg:6, bw:6 };
+  let selectedValue = '';
+  let membersData = {}; // { ww: [{name, value}], cat: [...], ... }
+
+  // --- Fetch all participants from DB ---
+  async function fetchAll() {
+    const { data, error } = await sb.from('participants').select('*').order('created_at', { ascending: true });
+    if (error) { console.error(error); return; }
+    membersData = {};
+    (data || []).forEach(row => {
+      if (!membersData[row.team]) membersData[row.team] = [];
+      membersData[row.team].push({ name: row.name, value: row.value });
+    });
+    renderTeams();
   }
-  function saveData(d) { localStorage.setItem('cg_members', JSON.stringify(d)); }
+
+  // --- Realtime subscription ---
+  sb.channel('participants-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, () => {
+      fetchAll();
+    })
+    .subscribe();
 
   function showTab(name, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     if (btn) btn.classList.add('active');
-    if (name === 'teams') renderTeams();
   }
 
   function selectValue(el, val) {
@@ -874,26 +891,25 @@
     selectedValue = val;
   }
 
-  function joinTeam() {
+  async function joinTeam() {
     const name = document.getElementById('input-name').value.trim();
     const team = document.getElementById('select-team').value;
     if (!name) { showToast('Inserisci il tuo nome 😊'); return; }
     if (!team) { showToast('Scegli la tua squadra!'); return; }
     if (!selectedValue) { showToast('Scegli il tuo superpotere!'); return; }
 
-    const data = getData();
-    if (!data[team]) data[team] = [];
-
-    const all = Object.values(data).flat();
+    // Check duplicates & limits from local cache
+    const all = Object.values(membersData).flat();
     if (all.find(m => m.name.toLowerCase() === name.toLowerCase())) {
       showToast('Questo nome è già presente!'); return;
     }
-    if (data[team].length >= LIMITS[team]) {
+    const teamMembers = membersData[team] || [];
+    if (teamMembers.length >= LIMITS[team]) {
       showToast('Squadra al completo! Scegline un\'altra ✨'); return;
     }
 
-    data[team].push({ name, value: selectedValue });
-    saveData(data);
+    const { error } = await sb.from('participants').insert({ name, team, value: selectedValue });
+    if (error) { showToast('Errore: ' + error.message); return; }
 
     document.getElementById('input-name').value = '';
     document.getElementById('select-team').value = '';
@@ -907,13 +923,12 @@
   }
 
   function renderTeams() {
-    const data = getData();
     const TOTAL = 25;
     let grand = 0;
 
     ['ww','cat','sg','bw'].forEach(team => {
       const ul = document.getElementById('members-' + team);
-      const members = data[team] || [];
+      const members = membersData[team] || [];
       document.getElementById('count-' + team).textContent = members.length;
       document.getElementById('bar-' + team).style.width = (members.length / LIMITS[team] * 100) + '%';
       grand += members.length;
@@ -926,10 +941,9 @@
       ).join('');
     });
 
-    // Stacked bar
     document.getElementById('total-count').textContent = grand;
     ['ww','cat','sg','bw'].forEach(team => {
-      const n = (data[team] || []).length;
+      const n = (membersData[team] || []).length;
       const pct = (n / TOTAL * 100).toFixed(1);
       document.getElementById('seg-' + team).style.width = pct + '%';
       const lab = document.getElementById('lab-' + team);
@@ -949,19 +963,18 @@
   }
 
   function downloadCSV() {
-    const data = getData();
     const teamNames = { ww: 'Wonder Women', cat: 'Catwomen', sg: 'Supergirls', bw: 'Black Widows' };
     const teamVirtues = { ww: 'Coraggio', cat: 'Curiosità', sg: 'Resilienza', bw: 'Strategia' };
     let rows = [['Nome', 'Squadra', 'Virtù squadra', 'Superpotere']];
     ['ww','cat','sg','bw'].forEach(team => {
-      (data[team] || []).forEach(m => {
+      (membersData[team] || []).forEach(m => {
         rows.push([m.name, teamNames[team], teamVirtues[team], m.value]);
       });
     });
     const total = rows.length - 1;
     if (total === 0) { showToast('Nessuna ragazza iscritta ancora!'); return; }
     const csv = rows.map(r => r.map(c => '"' + c.replace(/"/g, '""') + '"').join(',')).join('\r\n');
-    const bom = '\uFEFF'; // UTF-8 BOM for Excel
+    const bom = '\uFEFF';
     const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -981,16 +994,22 @@
   function closeModal() {
     document.getElementById('modal-overlay').classList.remove('show');
   }
-  function confirmReset() {
+  async function confirmReset() {
     const pin = document.getElementById('pin-input').value;
-    if (pin !== ADMIN_PIN) {
-      document.getElementById('pin-error').textContent = 'Codice errato. Riprova.';
+    const res = await fetch(SUPABASE_URL + '/functions/v1/reset-participants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ pin })
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      document.getElementById('pin-error').textContent = result.error || 'Errore';
       document.getElementById('pin-input').value = '';
       document.getElementById('pin-input').focus();
       return;
     }
-    localStorage.removeItem('cg_members');
     closeModal();
+    membersData = {};
     renderTeams();
     showToast('✅ Dati resettati.');
   }
@@ -1013,7 +1032,8 @@
     t._timer = setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  renderTeams();
+  // Initial load
+  fetchAll();
 </script>
 <footer style="text-align:center;padding:2rem 1rem 1.5rem;color:#484644;font-size:0.75rem;font-weight:300;letter-spacing:0.05em;">
   © Luigi Rossetti 2026 — All rights reserved
