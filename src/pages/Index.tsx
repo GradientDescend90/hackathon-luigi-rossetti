@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const pages = [
   { id: "teams", label: "🏆 Spirito di Squadra", src: "/coding-girlz.html", gradient: "linear-gradient(135deg, #e040fb, #00e5ff)" },
