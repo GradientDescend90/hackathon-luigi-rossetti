@@ -632,7 +632,7 @@
         <div class="team-name">Wonder Women</div>
         <div class="team-virtue">Coraggio</div>
         <ul class="team-members" id="members-ww"></ul>
-        <div class="team-count">Posti: <span id="count-ww">0</span> / 7</div>
+        <div class="team-count">Posti: <span id="count-ww">0</span> / 6</div>
         <div class="team-progress"><div class="team-progress-bar" id="bar-ww" style="width:0%"></div></div>
       </div>
       <div class="team-card" data-team="cat">
@@ -656,7 +656,7 @@
         <div class="team-name">Black Widows</div>
         <div class="team-virtue">Strategia</div>
         <ul class="team-members" id="members-bw"></ul>
-        <div class="team-count">Posti: <span id="count-bw">0</span> / 6</div>
+        <div class="team-count">Posti: <span id="count-bw">0</span> / 7</div>
         <div class="team-progress"><div class="team-progress-bar" id="bar-bw" style="width:0%"></div></div>
       </div>
     </div>
@@ -855,7 +855,7 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtb3hkYm9keWxkeGpiYmV4dWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDQwODEsImV4cCI6MjA4OTAyMDA4MX0.lywCjrp84mTa2MEAHDiBfSJkKxU6dvEUOuhvT_MEst8';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const LIMITS = { ww:7, cat:6, sg:6, bw:6 };
+  const LIMITS = { ww:6, cat:6, sg:6, bw:7 };
   let selectedValue = '';
   let membersData = {}; // { ww: [{name, value}], cat: [...], ... }
 
