@@ -855,7 +855,7 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtb3hkYm9keWxkeGpiYmV4dWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDQwODEsImV4cCI6MjA4OTAyMDA4MX0.lywCjrp84mTa2MEAHDiBfSJkKxU6dvEUOuhvT_MEst8';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const LIMITS = { ww:7, cat:6, sg:6, bw:6 };
+  const LIMITS = { ww:6, cat:6, sg:6, bw:7 };
   let selectedValue = '';
   let membersData = {}; // { ww: [{name, value}], cat: [...], ... }
 
