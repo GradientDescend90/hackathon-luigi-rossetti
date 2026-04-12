@@ -253,6 +253,55 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .note strong { color: #555350; font-weight: 500; }
 
+/* ── VIEW TOGGLE ── */
+.view-toggle {
+  display: flex; gap: 8px; max-width: 940px; margin: 0 auto;
+  padding: 1.5rem 2rem 0;
+}
+.view-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 9px 20px; border-radius: 10px;
+  border: 0.5px solid var(--border2);
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.view-btn:hover { background: var(--surface2); color: var(--text); }
+.view-btn.active {
+  background: var(--accent); color: #0d0d0f;
+  border-color: var(--accent);
+}
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* ── VALUTAZIONE (embedded app) ── */
+.val-wrap {
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-muted);
+  --color-text-tertiary: var(--text-dim);
+  --color-text-success: #3ecf8e;
+  --color-background-primary: var(--surface);
+  --color-background-secondary: var(--surface2);
+  --color-border-primary: rgba(255,255,255,0.22);
+  --color-border-secondary: var(--border2);
+  --color-border-tertiary: var(--border);
+  --color-border-info: var(--pre);
+}
+.val-wrap .note {
+  font-size: 12px; color: var(--text-muted); line-height: 1.55;
+  padding: 9px 12px; background: var(--surface2);
+  border-left: 2px solid var(--pre); border-radius: 0 6px 6px 0;
+  border-top: none; padding-top: 9px; margin-top: 10px;
+}
+.val-wrap .note strong { color: var(--text); }
+.val-wrap button {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  padding: 7px 16px; border-radius: 8px;
+  border: 0.5px solid var(--border2); background: transparent;
+  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+}
+.val-wrap button:hover { background: var(--surface2); color: var(--text); }
+
 /* ── FOOTER ── */
 footer {
   max-width: 940px; margin: 3rem auto 0;
@@ -293,6 +342,12 @@ footer {
   </div>
 </header>
 
+<div class="view-toggle">
+  <button class="view-btn active" onclick="switchView('competenze')">📊 Competenze</button>
+  <button class="view-btn" onclick="switchView('valutazione')">📝 Valutazione</button>
+</div>
+
+<div id="view-competenze" class="view-section active">
 <div class="main">
 
   <div class="card">
@@ -344,6 +399,327 @@ footer {
     <strong>Come leggere i valori</strong> · Ogni punteggio sulla scala 1–10 viene convertito in una percentuale compresa tra 0% (minimo assoluto della scala) e 100% (massimo assoluto). Questo permette di confrontare il cambiamento tra squadre e competenze su una base comune. Il Δ% indica quanti punti percentuali ha guadagnato — o perso — ciascuna squadra tra la rilevazione iniziale e quella finale.
   </div>
 
+</div>
+</div>
+
+<div id="view-valutazione" class="view-section">
+<div class="main val-wrap">
+  <h2 class="sr-only">Valutazione team hackathon</h2>
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}</style>
+  <style>
+  .val-wrap .tabs{display:flex;gap:5px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:16px;border-bottom:0.5px solid var(--border);}
+  .val-wrap button.tab{padding:5px 12px;border-radius:7px;border:0.5px solid var(--border2);background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer;}
+  .val-wrap button.tab.on{background:var(--surface2);color:var(--text);font-weight:500;border-color:rgba(255,255,255,0.22);}
+  .val-wrap .pg{display:none;}.val-wrap .pg.on{display:block;}
+  .val-wrap .flip-card{width:100%;perspective:1000px;cursor:pointer;margin-bottom:14px;}
+  .val-wrap .flip-inner{position:relative;width:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+  .val-wrap .flip-inner.flipped{transform:rotateY(180deg);}
+  .val-wrap .flip-front,.val-wrap .flip-back{width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:16px 18px;}
+  .val-wrap .flip-back{position:absolute;top:0;left:0;transform:rotateY(180deg);}
+  .val-wrap .flip-hint{font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;}
+  .val-wrap .team-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+  .val-wrap .t-ico{font-size:20px;flex-shrink:0;margin-top:2px;}
+  .val-wrap .t-name{font-size:16px;font-weight:500;}.val-wrap .t-sub{font-size:12px;margin-top:1px;}
+  .val-wrap .t-vote{font-size:26px;font-weight:500;margin-left:auto;flex-shrink:0;}
+  .val-wrap .members{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+  .val-wrap .chip{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px;}
+  .val-wrap .chip-leader{font-weight:500;}
+  .val-wrap .br{display:grid;grid-template-columns:128px 1fr 30px;gap:7px;align-items:center;margin-bottom:5px;}
+  .val-wrap .bl{font-size:12px;color:var(--text-muted);}
+  .val-wrap .bbg{height:7px;border-radius:4px;background:var(--surface2);overflow:hidden;}
+  .val-wrap .bf{height:100%;border-radius:4px;}
+  .val-wrap .bv{font-size:12px;font-weight:500;text-align:right;}
+  .val-wrap .dt{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 7px;}
+  .val-wrap .t2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
+  .val-wrap .bx{border:0.5px solid var(--border);border-radius:9px;padding:10px 12px;}
+  .val-wrap .bxt{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+  .val-wrap .li{display:flex;gap:6px;margin-bottom:5px;font-size:12px;line-height:1.45;}
+  .val-wrap .li:last-child{margin-bottom:0;}
+  .val-wrap .d{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+  .val-wrap .ok{background:#1D9E75;}.val-wrap .no{background:#D85A30;}.val-wrap .tip{background:#7F77DD;}
+  .val-wrap .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+  .val-wrap .tc{border:0.5px solid var(--border);border-radius:10px;padding:11px;cursor:pointer;transition:border-color 0.15s;}
+  .val-wrap .tc:hover{border-color:rgba(255,255,255,0.22);}
+  .val-wrap .tico{font-size:18px;}.val-wrap .tname{font-weight:500;font-size:13px;margin:3px 0 1px;}
+  .val-wrap .tvote{font-size:22px;font-weight:500;line-height:1;}
+  .val-wrap .tsub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .val-wrap .tmb{height:3px;border-radius:2px;background:var(--border);margin-top:7px;overflow:hidden;}
+  .val-wrap .tmf{height:100%;border-radius:2px;}
+  .val-wrap .dimgrid{display:grid;grid-template-columns:128px 1fr 1fr 1fr 1fr;gap:6px;align-items:center;margin-bottom:5px;}
+  .val-wrap .col4h{font-size:11px;color:var(--text-muted);text-align:center;}
+  .val-wrap .q-list{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .val-wrap .q-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:0.5px solid var(--border);border-radius:7px;font-size:12px;line-height:1.5;}
+  .val-wrap .q-num{font-size:11px;color:var(--text-dim);min-width:20px;margin-top:1px;flex-shrink:0;}
+  @media(max-width:600px){
+    .val-wrap .g4{grid-template-columns:1fr 1fr;}
+    .val-wrap .t2{grid-template-columns:1fr;}
+    .val-wrap .dimgrid{grid-template-columns:90px 1fr 1fr 1fr 1fr;gap:4px;}
+  }
+  </style>
+
+  <div class="tabs" id="val-tb">
+    <button class="tab on" data-p="val-ov">Panoramica</button>
+    <button class="tab" data-p="val-g">🟡 Giallo</button>
+    <button class="tab" data-p="val-v">🟢 Verde</button>
+    <button class="tab" data-p="val-a">🟠 Arancio</button>
+    <button class="tab" data-p="val-r">🌸 Rosa</button>
+    <button class="tab" data-p="val-x">Trasversale</button>
+  </div>
+
+  <div id="val-ov" class="pg on">
+    <div class="g4">
+      <div class="tc" onclick="valGo('val-g')">
+        <div class="tico">🟡</div><div class="tname">Wonder Women</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">Leader: Lalla</div>
+        <div class="tvote" style="color:#3ecf8e;">9</div>
+        <div class="tsub">12 dom · 50% Lv3–4</div>
+        <div class="tmb"><div class="tmf" style="width:90%;background:#1D9E75;"></div></div>
+      </div>
+      <div class="tc" onclick="valGo('val-v')">
+        <div class="tico">🟢</div><div class="tname">Black Widows</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">Leader: Rosalba</div>
+        <div class="tvote">8.5</div>
+        <div class="tsub">22 dom · 18% Lv3–4</div>
+        <div class="tmb"><div class="tmf" style="width:85%;background:#378ADD;"></div></div>
+      </div>
+      <div class="tc" onclick="valGo('val-a')">
+        <div class="tico">🟠</div><div class="tname">Catwomen</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">Leader: Martina</div>
+        <div class="tvote">8</div>
+        <div class="tsub">23 dom · 26% Lv3–4</div>
+        <div class="tmb"><div class="tmf" style="width:80%;background:#EF9F27;"></div></div>
+      </div>
+      <div class="tc" onclick="valGo('val-r')">
+        <div class="tico">🌸</div><div class="tname">Supergirls</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">Leader: Mericla</div>
+        <div class="tvote">7.5</div>
+        <div class="tsub">23 dom · 13% Lv3–4</div>
+        <div class="tmb"><div class="tmf" style="width:75%;background:#D4537E;"></div></div>
+      </div>
+    </div>
+    <div class="dt">Profilo comparativo per dimensione</div>
+    <div class="dimgrid"><span></span><span class="col4h">🟡 WW</span><span class="col4h">🟢 BW</span><span class="col4h">🟠 CW</span><span class="col4h">🌸 SG</span></div>
+    <div id="val-dr"></div>
+    <div class="note">Clicca su un team per vedere i membri, le domande originali e girare la card per leggere il feedback.</div>
+  </div>
+
+  <div id="val-g" class="pg">
+    <div class="flip-card" onclick="this.querySelector('.flip-inner').classList.toggle('flipped')">
+      <div class="flip-inner">
+        <div class="flip-front" style="background:#EAF3DE;border:0.5px solid #97C459;">
+          <div class="team-header">
+            <span class="t-ico">👑</span>
+            <div><div class="t-name" style="color:#173404;">Wonder Women</div><div class="t-sub" style="color:#3B6D11;">1° posto · Team Giallo · Leader: Lalla</div></div>
+            <div class="t-vote" style="color:#1D9E75;">9/10</div>
+          </div>
+          <div class="members">
+            <span class="chip chip-leader" style="background:#C0DD97;color:#27500A;">Lalla (leader)</span>
+            <span class="chip" style="background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;">Ludovica</span>
+            <span class="chip" style="background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;">Angela</span>
+            <span class="chip" style="background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;">francescaaa</span>
+            <span class="chip" style="background:#EAF3DE;color:#3B6D11;border:0.5px solid #97C459;">Michelle</span>
+          </div>
+          <div style="font-size:12px;color:#27500A;line-height:1.6;">Avete fatto qualcosa che nessun altro team ha fatto: avete scritto meno domande degli altri, ma quelle che avete scritto valgono il doppio. La vostra domanda migliore — <strong>"quale social genera più like a parità di visualizzazioni?"</strong> — contiene un'idea statistica avanzata che si chiama normalizzazione.</div>
+          <div class="flip-hint" style="color:#3B6D11;">Gira per analisi dettagliata →</div>
+        </div>
+        <div class="flip-back" style="background:var(--surface);border:0.5px solid var(--border);">
+          <div class="dt" style="margin-top:0;">Punteggi</div>
+          <div class="br"><span class="bl">Lettura del dato</span><div class="bbg"><div class="bf" style="width:87%;background:#1D9E75;"></div></div><span class="bv">3.5</span></div>
+          <div class="br"><span class="bl">Interp. critica</span><div class="bbg"><div class="bf" style="width:100%;background:#378ADD;"></div></div><span class="bv">4</span></div>
+          <div class="br"><span class="bl">Comunicazione</span><div class="bbg"><div class="bf" style="width:87%;background:#EF9F27;"></div></div><span class="bv">3.5</span></div>
+          <div class="br" style="margin-bottom:10px;"><span class="bl">Operatività</span><div class="bbg"><div class="bf" style="width:87%;background:#7F77DD;"></div></div><span class="bv">3.5</span></div>
+          <div class="t2">
+            <div class="bx"><div class="bxt">Funzionato</div>
+              <div class="li"><span class="d ok"></span><span>Normalizzazione spontanea ("a parità di views")</span></div>
+              <div class="li"><span class="d ok"></span><span>Impatto differenziale dei tag tra piattaforme</span></div>
+              <div class="li"><span class="d ok"></span><span>Falsificazione dell'assunto sui follower</span></div>
+              <div class="li"><span class="d ok"></span><span>Selezione interna = metacognizione applicata</span></div>
+            </div>
+            <div class="bx"><div class="bxt">Da migliorare</div>
+              <div class="li"><span class="d no"></span><span>1 ridondanza sui tag</span></div>
+              <div class="li"><span class="d no"></span><span>1 domanda prescrittiva sull'engagement</span></div>
+              <div class="li"><span class="d tip"></span><span>Mancava una domanda sugli outlier</span></div>
+            </div>
+          </div>
+          <div class="flip-hint">Gira per tornare →</div>
+        </div>
+      </div>
+    </div>
+    <div class="dt">Tutte le domande — post-it originali</div>
+    <div class="q-list" id="val-ql-g"></div>
+  </div>
+
+  <div id="val-v" class="pg">
+    <div class="flip-card" onclick="this.querySelector('.flip-inner').classList.toggle('flipped')">
+      <div class="flip-inner">
+        <div class="flip-front" style="background:#EEEDFE;border:0.5px solid #AFA9EC;">
+          <div class="team-header">
+            <span class="t-ico">🕷️</span>
+            <div><div class="t-name" style="color:#26215C;">Black Widows</div><div class="t-sub" style="color:#534AB7;">2° posto · Team Verde · Leader: Rosalba</div></div>
+            <div class="t-vote" style="color:#534AB7;">8.5/10</div>
+          </div>
+          <div class="members">
+            <span class="chip chip-leader" style="background:#AFA9EC;color:#26215C;">Rosalba (leader)</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">Venere</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">Miriana</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">laura</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">Sofia</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">carlotta</span>
+            <span class="chip" style="background:#EEEDFE;color:#534AB7;border:0.5px solid #AFA9EC;">Gaetana</span>
+          </div>
+          <div style="font-size:12px;color:#3C3489;line-height:1.6;">Il vostro punto di forza è il coraggio di chiedere <strong>"perché"</strong>. La domanda sulla differenza tra TikTok e YouTube è la più sofisticata tra tutti i team.</div>
+          <div class="flip-hint" style="color:#534AB7;">Gira per analisi dettagliata →</div>
+        </div>
+        <div class="flip-back" style="background:var(--surface);border:0.5px solid var(--border);">
+          <div class="dt" style="margin-top:0;">Punteggi</div>
+          <div class="br"><span class="bl">Lettura del dato</span><div class="bbg"><div class="bf" style="width:75%;background:#1D9E75;"></div></div><span class="bv">3</span></div>
+          <div class="br"><span class="bl">Interp. critica</span><div class="bbg"><div class="bf" style="width:80%;background:#378ADD;"></div></div><span class="bv">3.2</span></div>
+          <div class="br"><span class="bl">Comunicazione</span><div class="bbg"><div class="bf" style="width:50%;background:#EF9F27;"></div></div><span class="bv">2</span></div>
+          <div class="br" style="margin-bottom:10px;"><span class="bl">Operatività</span><div class="bbg"><div class="bf" style="width:62%;background:#7F77DD;"></div></div><span class="bv">2.5</span></div>
+          <div class="t2">
+            <div class="bx"><div class="bxt">Funzionato</div>
+              <div class="li"><span class="d ok"></span><span>2 "perché" causali — unico team col Rosa</span></div>
+              <div class="li"><span class="d ok"></span><span>Dimensione longitudinale (crescita follower)</span></div>
+              <div class="li"><span class="d ok"></span><span>Reel vs Shorts: formato equiv. cross-piattaforma</span></div>
+            </div>
+            <div class="bx"><div class="bxt">Da migliorare</div>
+              <div class="li"><span class="d no"></span><span>6 ridondanze nel cluster timing</span></div>
+              <div class="li"><span class="d no"></span><span>1 domanda fuori dataset</span></div>
+              <div class="li"><span class="d tip"></span><span>Revisione interna prima di consegnare</span></div>
+            </div>
+          </div>
+          <div class="flip-hint">Gira per tornare →</div>
+        </div>
+      </div>
+    </div>
+    <div class="dt">Tutte le domande — post-it originali</div>
+    <div class="q-list" id="val-ql-v"></div>
+  </div>
+
+  <div id="val-a" class="pg">
+    <div class="flip-card" onclick="this.querySelector('.flip-inner').classList.toggle('flipped')">
+      <div class="flip-inner">
+        <div class="flip-front" style="background:#FAEEDA;border:0.5px solid #EF9F27;">
+          <div class="team-header">
+            <span class="t-ico">🐱</span>
+            <div><div class="t-name" style="color:#412402;">Catwomen</div><div class="t-sub" style="color:#854F0B;">3° posto · Team Arancio · Leader: Martina</div></div>
+            <div class="t-vote" style="color:#854F0B;">8/10</div>
+          </div>
+          <div class="members">
+            <span class="chip chip-leader" style="background:#EF9F27;color:#412402;">Martina (leader)</span>
+            <span class="chip" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27;">francesca</span>
+            <span class="chip" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27;">Giorgia</span>
+            <span class="chip" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27;">Valentina</span>
+            <span class="chip" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27;">Sara</span>
+            <span class="chip" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27;">Aurora</span>
+          </div>
+          <div style="font-size:12px;color:#633806;line-height:1.6;">Siete state le più sistematiche: avete coperto cinque aree tematiche complete. La vostra domanda migliore è quella con <strong>"necessariamente"</strong>.</div>
+          <div class="flip-hint" style="color:#854F0B;">Gira per analisi dettagliata →</div>
+        </div>
+        <div class="flip-back" style="background:var(--surface);border:0.5px solid var(--border);">
+          <div class="dt" style="margin-top:0;">Punteggi</div>
+          <div class="br"><span class="bl">Lettura del dato</span><div class="bbg"><div class="bf" style="width:75%;background:#1D9E75;"></div></div><span class="bv">3</span></div>
+          <div class="br"><span class="bl">Interp. critica</span><div class="bbg"><div class="bf" style="width:62%;background:#378ADD;"></div></div><span class="bv">2.5</span></div>
+          <div class="br"><span class="bl">Comunicazione</span><div class="bbg"><div class="bf" style="width:50%;background:#EF9F27;"></div></div><span class="bv">2</span></div>
+          <div class="br" style="margin-bottom:10px;"><span class="bl">Operatività</span><div class="bbg"><div class="bf" style="width:75%;background:#7F77DD;"></div></div><span class="bv">3</span></div>
+          <div class="t2">
+            <div class="bx"><div class="bxt">Funzionato</div>
+              <div class="li"><span class="d ok"></span><span>5 cluster tematici completi</span></div>
+              <div class="li"><span class="d ok"></span><span>"Correlato" usato correttamente</span></div>
+              <div class="li"><span class="d ok"></span><span>"Necessariamente" — dubbio epistemico</span></div>
+              <div class="li"><span class="d ok"></span><span>Zero domande fuori dataset</span></div>
+            </div>
+            <div class="bx"><div class="bxt">Da migliorare</div>
+              <div class="li"><span class="d no"></span><span>7 ridondanze — durata ×4</span></div>
+              <div class="li"><span class="d no"></span><span>Zero domande causali con "perché"</span></div>
+              <div class="li"><span class="d no"></span><span>1 domanda normativa</span></div>
+            </div>
+          </div>
+          <div class="flip-hint">Gira per tornare →</div>
+        </div>
+      </div>
+    </div>
+    <div class="dt">Tutte le domande — post-it originali</div>
+    <div class="q-list" id="val-ql-a"></div>
+  </div>
+
+  <div id="val-r" class="pg">
+    <div class="flip-card" onclick="this.querySelector('.flip-inner').classList.toggle('flipped')">
+      <div class="flip-inner">
+        <div class="flip-front" style="background:#FBEAF0;border:0.5px solid #ED93B1;">
+          <div class="team-header">
+            <span class="t-ico">⚡</span>
+            <div><div class="t-name" style="color:#4B1528;">Supergirls</div><div class="t-sub" style="color:#993556;">4° posto · Team Rosa · Leader: Mericla</div></div>
+            <div class="t-vote" style="color:#993556;">7.5/10</div>
+          </div>
+          <div class="members">
+            <span class="chip chip-leader" style="background:#ED93B1;color:#4B1528;">Mericla (leader)</span>
+            <span class="chip" style="background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1;">Sara</span>
+            <span class="chip" style="background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1;">Rossella</span>
+            <span class="chip" style="background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1;">viviana</span>
+            <span class="chip" style="background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1;">Stella</span>
+            <span class="chip" style="background:#FBEAF0;color:#993556;border:0.5px solid #ED93B1;">Erika</span>
+          </div>
+          <div style="font-size:12px;color:#72243E;line-height:1.6;">Avete una domanda che nessun altro team ha saputo formulare: <strong>"il numero di commenti influisce sulle views? Se sì, su quale piattaforma?"</strong> — pensiero scientifico corretto.</div>
+          <div class="flip-hint" style="color:#993556;">Gira per analisi dettagliata →</div>
+        </div>
+        <div class="flip-back" style="background:var(--surface);border:0.5px solid var(--border);">
+          <div class="dt" style="margin-top:0;">Punteggi</div>
+          <div class="br"><span class="bl">Lettura del dato</span><div class="bbg"><div class="bf" style="width:62%;background:#1D9E75;"></div></div><span class="bv">2.5</span></div>
+          <div class="br"><span class="bl">Interp. critica</span><div class="bbg"><div class="bf" style="width:62%;background:#378ADD;"></div></div><span class="bv">2.5</span></div>
+          <div class="br"><span class="bl">Comunicazione</span><div class="bbg"><div class="bf" style="width:50%;background:#EF9F27;"></div></div><span class="bv">2</span></div>
+          <div class="br" style="margin-bottom:10px;"><span class="bl">Operatività</span><div class="bbg"><div class="bf" style="width:37%;background:#7F77DD;"></div></div><span class="bv">1.5</span></div>
+          <div class="t2">
+            <div class="bx"><div class="bxt">Funzionato</div>
+              <div class="li"><span class="d ok"></span><span>Cluster correlazioni — il migliore tra tutti</span></div>
+              <div class="li"><span class="d ok"></span><span>"Se sì, su quale piattaforma?" — struttura unica</span></div>
+              <div class="li"><span class="d ok"></span><span>Correlazione tra due metriche di engagement</span></div>
+            </div>
+            <div class="bx"><div class="bxt">Da migliorare</div>
+              <div class="li"><span class="d no"></span><span>8 ridondanze — timing con 7 varianti</span></div>
+              <div class="li"><span class="d no"></span><span>2 domande fuori dataset</span></div>
+              <div class="li"><span class="d no"></span><span>Operatività 1.5 — la più bassa</span></div>
+            </div>
+          </div>
+          <div class="flip-hint">Gira per tornare →</div>
+        </div>
+      </div>
+    </div>
+    <div class="dt">Tutte le domande — post-it originali</div>
+    <div class="q-list" id="val-ql-r"></div>
+  </div>
+
+  <div id="val-x" class="pg">
+    <div class="t2">
+      <div class="bx"><div class="bxt">Nessun team ha fatto</div>
+        <div class="li"><span class="d no"></span><span>Domande sugli outlier: "creator con pochi follower ma engagement altissimo?"</span></div>
+        <div class="li"><span class="d no"></span><span>Domande sul dataset: rappresentatività, periodo, bias</span></div>
+        <div class="li"><span class="d no"></span><span>Domande multivariate: "orario interagisce con piattaforma?"</span></div>
+        <div class="li"><span class="d no"></span><span>Revisione interna — tutti hanno ridondanze nel timing</span></div>
+      </div>
+      <div class="bx"><div class="bxt">Tutti i team hanno fatto</div>
+        <div class="li"><span class="d ok"></span><span>Identificato le variabili principali del dataset</span></div>
+        <div class="li"><span class="d ok"></span><span>Almeno qualche domanda correlazionale</span></div>
+        <div class="li"><span class="d ok"></span><span>Terminologia corretta: Reel, Short, Eng%, views</span></div>
+      </div>
+    </div>
+    <div class="t2">
+      <div class="bx"><div class="bxt">Elemento unico per team</div>
+        <div class="li"><span style="font-size:13px;margin-right:3px;">👑</span><span><strong>Wonder Women</strong> — normalizzazione ("a parità di views")</span></div>
+        <div class="li"><span style="font-size:13px;margin-right:3px;">🕷️</span><span><strong>Black Widows</strong> — dimensione longitudinale + ipotesi controfattuale</span></div>
+        <div class="li"><span style="font-size:13px;margin-right:3px;">🐱</span><span><strong>Catwomen</strong> — copertura 5 cluster + "necessariamente"</span></div>
+        <div class="li"><span style="font-size:13px;margin-right:3px;">⚡</span><span><strong>Supergirls</strong> — struttura condizionale "se sì, su quale piattaforma?"</span></div>
+      </div>
+      <div class="bx"><div class="bxt">Lezione successiva</div>
+        <div class="li"><span class="d tip"></span><span>Mostrare un outlier reale: "come cambia la vostra domanda migliore?"</span></div>
+        <div class="li"><span class="d tip"></span><span>Esercizio: dimezzare le domande duplicate mantenendo solo quelle con più valore</span></div>
+        <div class="li"><span class="d tip"></span><span>Introdurre "domanda nel dataset" vs "domanda sul dataset"</span></div>
+      </div>
+    </div>
+    <div class="note"><strong>La domanda che unifica tutto:</strong> "Quali variabili spiegano meglio le differenze di performance tra contenuti, piattaforme e creator?" — è quella che nessun team ha formulato e che la prossima lezione dovrebbe aprire.</div>
+  </div>
+
+</div>
 </div>
 
 <footer>
@@ -582,6 +958,76 @@ function renderChart() {
 
 buildTable();
 renderChart();
+
+// ── View switching ──
+function switchView(view) {
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelector(`.view-btn[onclick*="${view}"]`).classList.add('active');
+  if (view === 'competenze' && chartInst) {
+    setTimeout(() => chartInst.resize(), 50);
+  }
+}
+
+// ── Valutazione tabs ──
+const valQs = {
+  g:["Postare su Instagram di sera aumenta la possibilità di successo del contenuto?","Secondo me ci sono stati più commenti di lunedì alle 18 o di domenica alle 13?","Utilizzare più hashtag è correlato con l'engagement?","Il numero di tag su Instagram influisce sull'engagement?","I tag su TikTok ed Instagram hanno un impatto diverso sulla viralità del contenuto?","C'è un modo per aumentare l'engagement su YouTube?","Quale social genera più like a parità di visualizzazioni?","YouTube batte TikTok nei video lunghi o negli shorts?","TikTok favorisce i reel (video brevi) piuttosto che i post?","All'aumento della durata dei short su YouTube, i like aumentano o diminuiscono?","Dove crescono più velocemente i follower?","Anche se hai tanti follower puoi avere video con pochi like e views?"],
+  v:["Qual è il migliore orario per pubblicare su Instagram?","È meglio pubblicare alle 17 o alle 21?","È vero che l'orario migliore è alle due del pomeriggio?","A che ora del giorno si ottengono più visualizzazioni?","Il giorno della settimana in cui postare è lo stesso per tutte le piattaforme?","YouTube ha più spettatori la domenica o il lunedì?","Postare Reel (Shorts) di domenica aumenta i like?","Qual è il mese in cui si ricevono più views su TikTok?","Un post o un reel riceve più visualizzazioni?","Funzionano meglio i post o i reel su Instagram?","Perché tra TikTok e YouTube c'è una differenza così sostanziale, visto che su entrambi si pubblicano gli stessi contenuti?","Instagram al giorno d'oggi viene utilizzato di più o di meno rispetto a TikTok?","YouTube funziona meglio in termini di performance rispetto a TikTok?","Su Instagram i reel perché presentano meno commenti dei post?","Che tipologia di video porta a maggiore visibilità?","Utilizzare più tag su TikTok influisce sul numero di views?","Le condivisioni hanno una conseguenza sul numero di visualizzazioni?","Quali tematiche sono più gettonate su TikTok ed Instagram?","Il numero di follower influisce sulle views?","Il numero di follower incide maggiormente su YouTube o TikTok?","Profili con più follower hanno anche più like?","C'è una correlazione tra il numero di condivisioni e l'aumento di follower?"],
+  a:["A che ora è preferibile postare su TikTok?","In quale ora si ottengono più like?","L'ora del giorno influisce sui commenti e condivisioni?","I giorni con più probabilità di views cambiano da social a social?","Un contenuto pubblicato nel weekend riceve più visualizzazioni rispetto a uno durante la settimana?","I video di YouTube ricevono più like nel weekend o durante la settimana?","È giusto riproporre lo stesso contenuto su più piattaforme se è andato virale?","Che tipo di contenuto su Instagram ottiene più visualizzazioni?","Hanno più like su Instagram i post oppure i Reel?","I Reel di Instagram hanno più like di quelli di YouTube Shorts?","Quale piattaforma registra più views?","Si ottengono più visualizzazioni e like su TikTok o su Instagram?","È vero che su TikTok con più hashtag hai più probabilità di finire nei Per Te?","Quanti hashtag sono usati in media per i post di Instagram?","L'Engagement Rate è correlato al numero di tag?","La quantità di tag influisce sulle visualizzazioni?","Quanto la condivisione incide sull'engagement rate?","La durata dei video su YouTube influisce sul numero di like?","Quale relazione esiste tra la durata e le views?","La durata dei contenuti influenza i like?","La durata dei contenuti di YouTube è correlata al numero di like?","Avere più follower permette di avere più like?","I profili con più follower hanno necessariamente più like?"],
+  r:["Qual è l'orario migliore per pubblicare un post su Instagram?","A che ora del giorno si ottengono più visualizzazioni?","Quale ora è più adatta per postare un reel su TikTok?","Postare di domenica aumenta il numero dei like?","Qual è il giorno più adatto per postare su TikTok?","Qual è il giorno migliore per postare un reel su TikTok?","Qual è il giorno più quotato dalle persone?","Su Instagram i post hanno più views dei Reel?","Perché i Reel di TikTok sono più visitati rispetto a quelli di Instagram?","Tra Instagram e TikTok c'è una differenza nel numero di views?","In termini di views è più popolare Instagram o TikTok?","Su quale piattaforma si possono ricevere più like?","Quale piattaforma funziona di più con i post?","Con quale piattaforma ottengo la percentuale maggiore di engagement?","Quale social ha il numero di like più alto?","Le condivisioni incrementano il numero dei like e views?","Il numero di commenti influisce sulle views? Se sì, su quale piattaforma?","Il numero di views è correlato alla piattaforma utilizzata?","Maggiore è il numero di commenti e maggiore sarà il numero di like?","Il numero di hashtag è correlato all'engagement?","Un numero maggiore di tag influisce su like, commenti o views?","Qual è il social che ha avuto più decadenze?","Quale social è più sicuro?"]
+};
+
+["g","v","a","r"].forEach(k => {
+  const el = document.getElementById("val-ql-" + k);
+  if (!el) return;
+  valQs[k].forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "q-item";
+    div.innerHTML = `<span class="q-num">${i+1}</span><span>${q}</span>`;
+    el.appendChild(div);
+  });
+});
+
+document.querySelectorAll("#val-tb button.tab").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll("#val-tb button.tab").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll(".val-wrap .pg").forEach(x => x.classList.remove("on"));
+    t.classList.add("on");
+    document.getElementById(t.dataset.p).classList.add("on");
+  });
+});
+
+function valGo(id) {
+  document.querySelectorAll("#val-tb button.tab").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll(".val-wrap .pg").forEach(x => x.classList.remove("on"));
+  const key = id.replace('val-','');
+  const btn = document.querySelector(`#val-tb [data-p="${id}"]`);
+  if (btn) btn.classList.add("on");
+  document.getElementById(id).classList.add("on");
+}
+
+// Build comparative dimension rows
+const valDims = [
+  {l:"Lettura del dato",vs:[3.5,3,3,2.5],c:"#1D9E75"},
+  {l:"Interp. critica",vs:[4,3.2,2.5,2.5],c:"#378ADD"},
+  {l:"Comunicazione",vs:[3.5,2,2,2],c:"#EF9F27"},
+  {l:"Operatività",vs:[3.5,2.5,3,1.5],c:"#7F77DD"},
+];
+const valCont = document.getElementById("val-dr");
+if (valCont) {
+  valDims.forEach(d => {
+    const row = document.createElement("div");
+    row.className = "dimgrid";
+    row.style.marginBottom = "5px";
+    let h = `<span style="font-size:12px;color:var(--text-muted);">${d.l}</span>`;
+    d.vs.forEach(v => {
+      h += `<div style="display:flex;align-items:center;gap:4px;"><div style="flex:1;height:5px;border-radius:3px;background:var(--surface2);overflow:hidden;"><div style="width:${v/4*100}%;height:100%;border-radius:3px;background:${d.c};"></div></div><span style="font-size:11px;font-weight:500;min-width:18px;text-align:right;color:var(--text-muted);">${v}</span></div>`;
+    });
+    row.innerHTML = h;
+    valCont.appendChild(row);
+  });
+}
 </script>
 <footer style="text-align:center;padding:2rem 1rem 1.5rem;color:#484644;font-size:0.75rem;font-weight:300;letter-spacing:0.05em;border-top:0.5px solid rgba(255,255,255,0.07);margin-top:3rem;">
   © Luigi Rossetti 2026 — All rights reserved
